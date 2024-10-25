@@ -40,6 +40,7 @@ CREATE TABLE album(
     release_date DATE NOT NULL,
     num_tracks SMALLINT NOT NULL,
     runtime_seconds SMALLINT NOT NULL,
+    album_art_url TEXT,
     PRIMARY KEY (album_id),
     FOREIGN KEY (artist_id) REFERENCES artist(artist_id)
 );
