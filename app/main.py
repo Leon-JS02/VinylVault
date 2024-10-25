@@ -32,4 +32,5 @@ def display_album(album_id: int):
 if __name__ == "__main__":
     app.config["DEBUG"] = True
     app.config["TESTING"] = True
+
     app.run(port=8080, debug=True)
