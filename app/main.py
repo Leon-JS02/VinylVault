@@ -16,6 +16,7 @@ def display_search():
     """Displays search results of a particular query (made through a POST request)."""
     return {"message": "Displaying search results..."}, 200
 
+
 @app.route("/add/<str:spotify_album_id>", methods=["POST"])
 def add(spotify_album_id: str):
     """Adds an album of a specific Spotify ID to the user's collection."""
