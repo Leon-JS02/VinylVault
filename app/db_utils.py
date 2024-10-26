@@ -31,6 +31,7 @@ def insert_artist(spotify_artist_id: str, artist_name: str) -> int:
         with get_cursor(conn) as cur:
             cur.execute(stmt, (spotify_artist_id, artist_name,))
             artist_id = cur.fetchone()['artist_id']
+        conn.commit()
     return artist_id
 
 
@@ -42,4 +43,14 @@ def insert_genre(genre_name: str) -> int:
         with get_cursor(conn) as cur:
             cur.execute(stmt, (genre_name,))
             genre_id = cur.fetchone()['genre_id']
+        conn.commit()
     return genre_id
+
+def insert_artist_genre_assignment(artist_id: int, genre_id: int):
+    """Inserts an artist genre assignment into the database."""
+    stmt = """INSERT INTO artist_genre_assignment(artist_id, genre_id)
+    VALUES (%s, %s);"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt, (artist_id, genre_id,))
+        conn.commit()
