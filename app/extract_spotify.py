@@ -35,7 +35,7 @@ def parse_release_date(release_date: str, release_date_precision: str) -> str:
 def parse_artists(album: dict) -> str:
     """Returns a string of comma joined artists from a Spotify album dict."""
     artists = [x['name'] for x in album.get("artists",[])]
-    return ",".join(artists)
+    return ", ".join(artists)
 
 def get_image_url(album: dict) -> str:
     """Returns the URL for an album's art from a dict."""
