@@ -2,8 +2,10 @@
 
 from datetime import datetime
 import requests as req
-
-from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT
+from dotenv import load_dotenv
+from os import environ as ENV
+from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT, ALBUM_ENDPOINT
+from db_utils import insert_artist, insert_genre, insert_artist_genre_assignment, insert_album
 
 TIMEOUT = 10
 
@@ -26,12 +28,42 @@ def call_get_artist_endpoint(artist_id: str, access_token: str) -> dict:
         return response.json()
     raise ConnectionError(f"Failed to retrieve data. Code: {response.status_code}")
 
+def call_get_album_endpoint(album_id: str, access_token: str) -> dict:
+    """Makes an API call to the artist_id endpoint. Returns the response dict."""
+    url = f"{ALBUM_ENDPOINT}{album_id}"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = req.get(url, headers=headers, timeout=TIMEOUT)
+    if response.status_code == 200:
+        return response.json()
+    raise ConnectionError(f"Failed to retrieve data. Code: {response.status_code}")
+
 def parse_artist_from_api(response: dict) -> dict:
-    """Removes unnecessary details from an get artist API response."""
+    """Removes unnecessary details from a get artist API response."""
     return{
         'spotify_id': response['id'],
         'name': response['name'],
         'genres': response['genres']
+    }
+
+def calculate_runtime(tracks: dict) -> int:
+    """Calculates the runtime of an album from a tracks dict."""
+    items = tracks.get('items', [])
+    return round(sum([x.get('duration_ms', 0) for x in items])/1000)
+
+def parse_album_from_api(response: dict) -> dict:
+    """Removes unnecessary details from a get album API response."""
+    return {
+        'num_tracks': response['total_tracks'],
+        'album_type': response['album_type'],
+        'artists': [{
+            'spotify_id': x['id'],
+            'name': x['name']
+        } for x in response['artists']],
+        'runtime_seconds': calculate_runtime(response['tracks']),
+        'title': response['name'],
+        'release_date': parse_release_date(response['release_date'], 
+                                           response['release_date_precision']),
+        'art_url': get_image_url(response)
     }
 
 def parse_release_date(release_date: str, release_date_precision: str) -> str:
@@ -47,7 +79,7 @@ def parse_release_date(release_date: str, release_date_precision: str) -> str:
         return date_obj.strftime("01/%m/%Y")
 
     date_obj = datetime.strptime(release_date, "%Y-%m-%d")
-    return date_obj.strftime("%d/%m/%Y")
+    return date_obj.strftime("%Y-%m-%d")
 
 def parse_artists(album: dict) -> str:
     """Returns a string of comma joined artists from a Spotify album dict."""
@@ -77,3 +109,33 @@ def parse_search_results(albums: list[dict]) -> list[dict]:
         }
         for x in albums
     ]
+
+def add_album(spotify_album_id: str, access_token: str):
+    """Adds an album to the database, handling foreign key dependencies."""
+    try:
+        response = call_get_album_endpoint(spotify_album_id, access_token)
+        cleaned = parse_album_from_api(response)
+        artists = cleaned['artists']
+        artist_ids = {x['spotify_id']: insert_artist(x['spotify_id'], x['name']) for x in artists}
+        
+        for x in artists:
+            artist_info = parse_artist_from_api(call_get_artist_endpoint(x['spotify_id'], access_token))
+            for genre in artist_info.get('genres', []):
+                genre_id = insert_genre(genre)
+                insert_artist_genre_assignment(artist_ids[x['spotify_id']], genre_id)
+        
+        primary_artist_id = artist_ids[artists[0]['spotify_id']]
+        album_info = (
+            primary_artist_id, spotify_album_id, cleaned['album_type'],
+            cleaned['title'], cleaned['release_date'], cleaned['num_tracks'],
+            cleaned['runtime_seconds'], cleaned['art_url']
+        )
+        insert_album(album_info)
+        
+    except Exception as e:
+        print(f"Failed to add album {spotify_album_id}: {e}")
+
+if __name__ == "__main__":
+    load_dotenv()
+    test_id = "5HOHne1wzItQlIYmLXLYfZ"
+    add_album(test_id, ENV['ACCESS_TOKEN'])
