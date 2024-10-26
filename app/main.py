@@ -1,7 +1,7 @@
 """The main endpoints for the app's front-end."""
 from os import environ as ENV
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
@@ -15,7 +15,7 @@ load_dotenv()
 @app.route("/", methods=["GET"])
 def index():
     """Homepage for the app."""
-    return app.send_static_file("index.html"), 200
+    return render_template("index.html"), 200
 
 
 @app.route("/display_search", methods=["POST"])
