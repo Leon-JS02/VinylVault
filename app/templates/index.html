@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
 
 <head>
 	<meta charset="UTF-8">
@@ -9,7 +9,12 @@
 </head>
 
 <body>
-    <h1>Hello, world!</h1>
+    <div class="container">
+        <img src="{{ url_for('static', filename='images/vinyl_vault.png') }}" alt="VinylVault" class="logo">
+        <div class="search-container">
+            <input type="text" placeholder="Search an album..." class="search-bar">
+            <span class="search-icon">&#128269;</span>
+        </div>
+    </div>
 </body>
-
 </html>

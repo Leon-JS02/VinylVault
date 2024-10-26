@@ -1,5 +1,5 @@
 
-![img](/assets/vinyl_vault.png)
+![img](/app/static/images/vinyl_vault.png)
 
 ## What is VinylVault? 
 **VinylVault** is a web-app designed to help users track and manage their music collections. 
