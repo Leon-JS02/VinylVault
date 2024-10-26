@@ -54,3 +54,19 @@ def insert_artist_genre_assignment(artist_id: int, genre_id: int):
         with get_cursor(conn) as cur:
             cur.execute(stmt, (artist_id, genre_id,))
         conn.commit()
+
+def insert_album(album_info: tuple) -> int:
+    """Inserts an album into the database, returning its ID."""
+    (artist_id, spotify_album_id, album_type, album_name,
+    release_date, num_tracks, runtime_seconds, art_url) = album_info
+    stmt = """INSERT INTO album(artist_id, spotify_album_id, album_type,
+    album_name, release_date, num_tracks, runtime_seconds, album_art_url)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING album_id;"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt, (artist_id, spotify_album_id, album_type,
+            album_name, release_date, num_tracks, runtime_seconds, art_url,))
+            album_id = cur.fetchone()['album_id']
+        conn.commit()
+    return album_id
+
