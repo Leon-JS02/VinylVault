@@ -4,8 +4,7 @@ from os import environ as ENV
 from flask import Flask, request
 from dotenv import load_dotenv
 
-from extract_spotify import (search_album, parse_search_results, add_album,
-                             call_get_album_endpoint, parse_album_from_api)
+from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id
 from authorisation.access_manager import generate_and_replace
 
@@ -16,7 +15,7 @@ load_dotenv()
 @app.route("/", methods=["GET"])
 def index():
     """Homepage for the app."""
-    return {"message": "VinylVault Search"}, 200
+    return app.send_static_file("index.html"), 200
 
 
 @app.route("/display_search", methods=["POST"])
