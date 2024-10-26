@@ -2,6 +2,7 @@
 
 DROP TABLE IF EXISTS access_tokens;
 DROP TABLE IF EXISTS genre CASCADE;
+DROP TABLE IF EXISTS tag CASCADE;
 DROP TABLE IF EXISTS album CASCADE;
 DROP TABLE IF EXISTS artist CASCADE;
 DROP TABLE IF EXISTS artist_genre_assignment;
@@ -31,6 +32,12 @@ CREATE TABLE genre(
     PRIMARY KEY (genre_id)
 );
 
+CREATE TABLE tag(
+    tag_id INT GENERATED ALWAYS AS IDENTITY,
+    tag_name VARCHAR(100) NOT NULL UNIQUE,
+    PRIMARY KEY (tag_id)
+);
+
 CREATE TABLE album(
     album_id INT GENERATED ALWAYS AS IDENTITY,
     artist_id INT NOT NULL,
@@ -45,13 +52,13 @@ CREATE TABLE album(
     FOREIGN KEY (artist_id) REFERENCES artist(artist_id)
 );
 
-CREATE TABLE album_genre_assignment(
+CREATE TABLE album_tag_assignment(
     assignment_id INT GENERATED ALWAYS AS IDENTITY,
     album_id INT NOT NULL,
-    genre_id INT NOT NULL,
+    tag_id INT NOT NULL,
     FOREIGN KEY (album_id) REFERENCES album(album_id) ON DELETE CASCADE,
-    FOREIGN KEY (genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE,
-    UNIQUE (album_id, genre_id)
+    FOREIGN KEY (tag_id) REFERENCES tag(tag_id) ON DELETE CASCADE,
+    UNIQUE (album_id, tag_id)
 );
 
 CREATE TABLE artist_genre_assignment(
