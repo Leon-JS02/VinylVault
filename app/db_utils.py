@@ -86,11 +86,6 @@ def insert_album(album_info: tuple) -> int:
     return album_id
 
 
-def get_album_genres(album_id: int) -> list[str]:
-    """Retrieves all genres mapped to a speciifc album ID."""
-    pass
-
-
 def get_album_by_id(album_id: int) -> dict:
     """Retrieves full details of an album from the database by a specific ID."""
     stmt = """SELECT ar.artist_name, a.*, 
