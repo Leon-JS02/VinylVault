@@ -17,6 +17,11 @@ def display_search():
     return {"message": "Displaying search results..."}, 200
 
 
+@app.route("/add/<str:spotify_album_id>", methods=["POST"])
+def add(spotify_album_id: str):
+    """Adds an album of a specific Spotify ID to the user's collection."""
+    return {"message": "Adding album to collection..."}, 200
+
 @app.route("/collection", methods=["GET"])
 def collection():
     """Displays the user's entire collection within their database."""
