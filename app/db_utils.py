@@ -46,6 +46,16 @@ def insert_genre(genre_name: str) -> int:
         conn.commit()
     return genre_id
 
+def get_all_artists() -> dict:
+    """Returns a dict of all Spotify artist IDs in the database."""
+    stmt = "SELECT artist_id, spotify_artist_id FROM artist;"
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt)
+            results = cur.fetchall()
+    return {x['spotify_artist_id']: x['artist_id'] for x in results}
+
+
 def insert_artist_genre_assignment(artist_id: int, genre_id: int):
     """Inserts an artist genre assignment into the database."""
     stmt = """INSERT INTO artist_genre_assignment(artist_id, genre_id)
