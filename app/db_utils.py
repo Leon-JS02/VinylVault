@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def get_connection() -> connection:
     """Returns a database connection."""
     return connect(
@@ -19,9 +20,11 @@ def get_connection() -> connection:
         port=ENV['DB_PORT']
     )
 
+
 def get_cursor(conn: connection) -> cursor:
     """Returns a database cursor for a connection."""
     return conn.cursor(cursor_factory=RealDictCursor)
+
 
 def insert_artist(spotify_artist_id: str, artist_name: str) -> int:
     """Inserts an artist into the database, returning its ID."""
@@ -46,6 +49,7 @@ def insert_genre(genre_name: str) -> int:
         conn.commit()
     return genre_id
 
+
 def get_all_artists() -> dict:
     """Returns a dict of all Spotify artist IDs in the database."""
     stmt = "SELECT artist_id, spotify_artist_id FROM artist;"
@@ -65,18 +69,42 @@ def insert_artist_genre_assignment(artist_id: int, genre_id: int):
             cur.execute(stmt, (artist_id, genre_id,))
         conn.commit()
 
+
 def insert_album(album_info: tuple) -> int:
     """Inserts an album into the database, returning its ID."""
     (artist_id, spotify_album_id, album_type, album_name,
-    release_date, num_tracks, runtime_seconds, art_url) = album_info
+     release_date, num_tracks, runtime_seconds, art_url) = album_info
     stmt = """INSERT INTO album(artist_id, spotify_album_id, album_type,
     album_name, release_date, num_tracks, runtime_seconds, album_art_url)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING album_id;"""
     with get_connection() as conn:
         with get_cursor(conn) as cur:
             cur.execute(stmt, (artist_id, spotify_album_id, album_type,
-            album_name, release_date, num_tracks, runtime_seconds, art_url,))
+                               album_name, release_date, num_tracks, runtime_seconds, art_url,))
             album_id = cur.fetchone()['album_id']
         conn.commit()
     return album_id
 
+
+def get_album_by_id(album_id: int) -> dict:
+    """Retrieves full details of an album from the database by a specific ID."""
+    stmt = """SELECT ar.artist_name, a.*, 
+    STRING_AGG(g.genre_name, ', ' ORDER BY g.genre_name ASC) 
+    AS genres FROM genre AS g JOIN artist_genre_assignment 
+    USING(genre_id) JOIN album AS a USING(artist_id) 
+    JOIN artist AS ar USING(artist_id) WHERE album_id = %s
+    GROUP BY a.album_id, ar.artist_name;"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt, (album_id,))
+            res = cur.fetchone()
+
+    return {
+        "title": res['album_name'],
+        "artist": res['artist_name'],
+        "genres": res['genres'],
+        "release_date": res['release_date'],
+        "num_tracks": res['num_tracks'],
+        "runtime_seconds": res['runtime_seconds'],
+        "album_art_url": res['album_art_url']
+    }
