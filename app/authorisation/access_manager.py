@@ -5,7 +5,7 @@ from os import environ as ENV
 import requests as req
 from dotenv import set_key
 
-from authorisation.auth_db_handler import insert_new_access_token, check_token_validity
+from auth_db_handler import insert_new_access_token, check_token_validity
 
 TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 REQUIRED_AUTH_KEYS = ["CLIENT_ID", "CLIENT_SECRET", "ACCESS_TOKEN"]
