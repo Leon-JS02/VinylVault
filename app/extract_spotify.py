@@ -1,12 +1,9 @@
 """Script to handle the querying of the external Spotify API."""
 
-from os import environ as ENV
 from datetime import datetime
 import requests as req
-from dotenv import load_dotenv
 
 from endpoints import SEARCH_ENDPOINT
-from authorisation.access_manager import generate_and_replace
 
 TIMEOUT = 10
 
@@ -44,7 +41,7 @@ def get_image_url(album: dict) -> str:
     """Returns the URL for an album's art from a dict."""
     images = [x['url'] for x in album['images']]
     return images[0] if images else None
-    
+
 
 def parse_search_results(albums: list[dict]) -> list[dict]:
     """Strips unnecessary information from the album dictionaries.
