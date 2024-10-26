@@ -47,7 +47,7 @@ def display_album(album_id: int):
     """Displays an album of a particular ID within the user's collection."""
     # Get album by ID.
     album_info = get_album_by_id(album_id)
-    return {}, 200
+    return album_info, 200
 
 
 if __name__ == "__main__":
