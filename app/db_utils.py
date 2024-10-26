@@ -97,7 +97,7 @@ def get_album_by_id(album_id: int) -> dict:
     with get_connection() as conn:
         with get_cursor(conn) as cur:
             cur.execute(stmt, (album_id,))
-        res = cur.fetchone()
+            res = cur.fetchone()
 
     return {
         "title": res['album_name'],
