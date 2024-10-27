@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id
-from authorisation.access_manager import generate_and_replace
 
 app = Flask(__name__)
 load_dotenv()
@@ -22,7 +21,6 @@ def index():
 def display_search():
     """Displays search results of a particular query (made through a POST request)."""
     query = request.form.get("search_query")
-    print(query)
     results = search_album(query, ENV['ACCESS_TOKEN'])
     parsed_results = parse_search_results(results)
     return parsed_results, 200
