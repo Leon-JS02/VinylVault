@@ -2,10 +2,15 @@
 
 from datetime import datetime
 import requests as req
+
+
+from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT
+
 from dotenv import load_dotenv
 from os import environ as ENV
 from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT, ALBUM_ENDPOINT
-from db_utils import insert_artist, insert_genre, insert_artist_genre_assignment, insert_album, get_all_artists
+from db_utils import insert_artist, insert_genre, insert_artist_genre_assignment, insert_album, get_all_artists, get_all_genres
+
 
 TIMEOUT = 10
 
@@ -132,6 +137,9 @@ def add_album(spotify_album_id: str, access_token: str):
         cleaned = parse_album_from_api(response)
         artists = cleaned['artists']
         all_artists = get_all_artists()
+
+        all_genres = get_all_genres()
+
         for artist in artists:
             spotify_id = artist['spotify_id']
             if spotify_id not in all_artists:
@@ -141,7 +149,12 @@ def add_album(spotify_album_id: str, access_token: str):
                 artist_info = parse_artist_from_api(
                     call_get_artist_endpoint(spotify_id, access_token))
                 for genre in artist_info.get('genres', []):
-                    genre_id = insert_genre(genre)
+                    if genre not in all_genres:
+                        genre_id = insert_genre(genre)
+                        all_genres[genre] = genre_id
+                    else:
+                        genre_id = all_genres[genre]
+
                     insert_artist_genre_assignment(artist_id, genre_id)
             else:
                 artist_id = all_artists[spotify_id]
