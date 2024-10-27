@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id
-from authorisation.access_manager import generate_and_replace
 
 app = Flask(__name__)
 load_dotenv()
