@@ -22,7 +22,6 @@ def index():
 def display_search():
     """Displays search results of a particular query (made through a POST request)."""
     query = request.form.get("search_query")
-    print(query)
     results = search_album(query, ENV['ACCESS_TOKEN'])
     parsed_results = parse_search_results(results)
     return parsed_results, 200
