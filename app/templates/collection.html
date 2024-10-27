@@ -4,13 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <title>VinylVault - Search Results</title>
+    <title>VinylVault - Your Collection</title>
     <style>
-        * {
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
         .container {
             max-width: 90%;
             margin: 0 auto;
@@ -22,7 +17,6 @@
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
         }
-
         .album-card {
             background-color: #f8f8f8;
             border-radius: 8px;
@@ -30,39 +24,19 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
             padding-bottom: 10px;
-            cursor: pointer;
-        }
-        .image-container {
-            position: relative;
         }
 
         .album-card img {
             width: 100%;
             aspect-ratio: 1;
             object-fit: cover;
-            transition: opacity 0.3s ease;
+            
         }
-        .album-card:hover img {
-            opacity: 0.6;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            font-size: 3em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .album-card:hover .overlay {
-            opacity: 1;
-        }
+
+        .album-card:hover{
+            transition: transform .3s;
+            transform: scale(1.1);
+        } 
 
         .album-info {
             padding: 10px;
@@ -74,30 +48,25 @@
             margin-top: 10px;
         }
 
-        h1 {
-            font-size: 20px;
-        }
-
         .album-artist,
         .album-release-date {
             font-size: 0.9em;
             color: #555;
         }
+
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Search results for '{{ query }}'...</h1>
+        <h1>Your Collection</h1>
 
         <div class="album-grid">
             {% for album in albums %}
             <div class="album-card">
                 <input type="hidden" value="{{ album['spotify_id'] }}" />
-                <div class="image-container">
-                    <img src="{{ album['img_url'] }}" alt="{{ album['title'] }} album cover">
-                    <div class="overlay" onclick="call_add('{{ album['spotify_id'] }}')">+</div>
-                </div>
+
+                <img src="{{ album['img_url'] }}" alt="{{ album['title'] }} album cover">
 
                 <div class="album-info">
                     <div class="album-title">{{ album['title'] }}</div>

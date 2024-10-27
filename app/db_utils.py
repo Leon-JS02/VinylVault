@@ -86,6 +86,24 @@ def insert_album(album_info: tuple) -> int:
     return album_id
 
 
+def get_all_albums() -> list[dict]:
+    """Retrieves a list of all albums from the user's collection."""
+    stmt = """SELECT ar.artist_name, a.* FROM
+    artist AS ar JOIN album AS a USING (artist_id);"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt)
+            res = cur.fetchall()
+    return [
+        {
+            'album_id': x['album_id'],
+            'title': x['album_name'],
+            'artist': x['artist_name'],
+            'release_date': x['release_date'],
+            'img_url': x['album_art_url']
+        } for x in res]
+
+
 def get_album_by_id(album_id: int) -> dict:
     """Retrieves full details of an album from the database by a specific ID."""
     stmt = """SELECT ar.artist_name, a.*, 
