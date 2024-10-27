@@ -10,6 +10,7 @@ from db_utils import get_album_by_id, get_all_albums
 from authorisation.access_manager import generate_and_replace
 
 app = Flask(__name__)
+generate_and_replace()
 load_dotenv()
 
 
