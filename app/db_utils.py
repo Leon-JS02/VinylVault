@@ -50,7 +50,6 @@ def insert_genre(genre_name: str) -> int:
     return genre_id
 
 
-
 def get_all_artists() -> dict:
     """Returns a dict of all Spotify artist IDs in the database."""
     stmt = "SELECT artist_id, spotify_artist_id FROM artist;"
@@ -59,7 +58,6 @@ def get_all_artists() -> dict:
             cur.execute(stmt)
             results = cur.fetchall()
     return {x['spotify_artist_id']: x['artist_id'] for x in results}
-
 
 
 def insert_artist_genre_assignment(artist_id: int, genre_id: int):
@@ -104,7 +102,6 @@ def get_all_albums() -> list[dict]:
             'release_date': x['release_date'],
             'img_url': x['album_art_url']
         } for x in res]
-
 
 
 def get_all_artists() -> dict:

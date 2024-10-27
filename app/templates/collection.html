@@ -76,9 +76,9 @@
             {% for album in albums %}
             <div class="album-card">
                 <input type="hidden" value="{{ album['spotify_id'] }}" />
-
-                <img src="{{ album['img_url'] }}" alt="{{ album['title'] }} album cover">
-
+                <a href="/collection/{{ album['album_id'] }}">
+                    <img src="{{ album['img_url'] }}" alt="{{ album['title'] }} album cover">
+                </a>
                 <div class="album-info">
                     <div class="album-title">{{ album['title'] }}</div>
                     <div class="album-artist">{{ album['artist'] }}</div>
