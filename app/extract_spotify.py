@@ -2,8 +2,15 @@
 
 from datetime import datetime
 import requests as req
+<<<<<<< Updated upstream
 
 from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT
+=======
+from dotenv import load_dotenv
+from os import environ as ENV
+from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT, ALBUM_ENDPOINT
+from db_utils import insert_artist, insert_genre, insert_artist_genre_assignment, insert_album, get_all_artists, get_all_genres
+>>>>>>> Stashed changes
 
 TIMEOUT = 10
 
@@ -77,3 +84,51 @@ def parse_search_results(albums: list[dict]) -> list[dict]:
         }
         for x in albums
     ]
+<<<<<<< Updated upstream
+=======
+
+
+def add_album(spotify_album_id: str, access_token: str):
+    """Adds an album to the database, handling foreign key dependencies."""
+    try:
+        response = call_get_album_endpoint(spotify_album_id, access_token)
+        cleaned = parse_album_from_api(response)
+        artists = cleaned['artists']
+        all_artists = get_all_artists()
+        all_genres = get_all_genres()
+        for artist in artists:
+            spotify_id = artist['spotify_id']
+            if spotify_id not in all_artists:
+                artist_id = insert_artist(spotify_id, artist['name'])
+                all_artists[spotify_id] = artist_id
+                artist_info = parse_artist_from_api(
+                    call_get_artist_endpoint(spotify_id, access_token))
+                for genre in artist_info.get('genres', []):
+                    if genre not in all_genres:
+                        genre_id = insert_genre(genre)
+                        all_genres[genre] = genre_id
+                    else:
+                        genre_id = all_genres[genre]
+
+                    insert_artist_genre_assignment(artist_id, genre_id)
+            else:
+                artist_id = all_artists[spotify_id]
+        primary_artist_id = all_artists[artists[0]['spotify_id']]
+
+        album_info = (
+            primary_artist_id, spotify_album_id, cleaned['album_type'],
+            cleaned['title'], cleaned['release_date'], cleaned['num_tracks'],
+            cleaned['runtime_seconds'], cleaned['art_url']
+        )
+
+        insert_album(album_info)
+
+    except Exception as e:
+        print(f"Failed to add album {spotify_album_id}: {e}")
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    test_id = "5vkqYmiPBYLaalcmjujWxK"
+    add_album(test_id, ENV['ACCESS_TOKEN'])
+>>>>>>> Stashed changes
