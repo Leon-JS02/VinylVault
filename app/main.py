@@ -23,7 +23,7 @@ def display_search():
     query = request.form.get("search_query")
     results = search_album(query, ENV['ACCESS_TOKEN'])
     parsed_results = parse_search_results(results)
-    return parsed_results, 200
+    return render_template("display_search.html", albums=parsed_results)
 
 
 @app.route("/add/<string:spotify_album_id>", methods=["POST"])
