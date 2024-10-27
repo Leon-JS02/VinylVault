@@ -5,7 +5,9 @@ from flask import Flask, request, render_template
 from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
-from db_utils import get_album_by_id
+from db_utils import get_album_by_id, get_all_albums
+
+from authorisation.access_manager import generate_and_replace
 
 app = Flask(__name__)
 load_dotenv()
@@ -20,10 +22,10 @@ def index():
 @app.route("/display_search", methods=["POST"])
 def display_search():
     """Displays search results of a particular query (made through a POST request)."""
-    query = request.form.get("search_query")
+    query = request.form.get("search_query").title()
     results = search_album(query, ENV['ACCESS_TOKEN'])
     parsed_results = parse_search_results(results)
-    return render_template("display_search.html", albums=parsed_results)
+    return render_template("display_search.html", albums=parsed_results, query=query)
 
 
 @app.route("/add/<string:spotify_album_id>", methods=["POST"])
@@ -36,7 +38,8 @@ def add(spotify_album_id: str):
 @app.route("/collection", methods=["GET"])
 def collection():
     """Displays the user's entire collection within their database."""
-    return {"message": "Displaying all albums in collection..."}, 200
+    albums = get_all_albums()
+    return render_template("collection.html", albums=albums), 200
 
 
 @app.route("/collection/<int:album_id>", methods=["GET"])
