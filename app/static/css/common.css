@@ -30,6 +30,10 @@ body {
 
         .nav-icon {
             font-size: 1.7em;
+            gap: 40px;
+        }
+
+        .nav-icon {
             color: black;
             text-decoration: none;
             position: relative;

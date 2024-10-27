@@ -2,17 +2,18 @@
 
 from datetime import datetime
 import requests as req
-<<<<<<< Updated upstream
+
 
 from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT
-=======
+
 from dotenv import load_dotenv
 from os import environ as ENV
 from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT, ALBUM_ENDPOINT
 from db_utils import insert_artist, insert_genre, insert_artist_genre_assignment, insert_album, get_all_artists, get_all_genres
->>>>>>> Stashed changes
+
 
 TIMEOUT = 10
+
 
 def search_album(query: str, access_token: str) -> list[dict]:
     """Returns a list of album dictionaries matching a specific search
@@ -22,7 +23,9 @@ def search_album(query: str, access_token: str) -> list[dict]:
     response = req.get(url, headers=headers, timeout=TIMEOUT)
     if response.status_code == 200:
         return response.json()["albums"]["items"]
-    raise ConnectionError(f"Failed to retrieve data. Code: {response.status_code}")
+    raise ConnectionError(
+        f"Failed to retrieve data. Code: {response.status_code}:{access_token}")
+
 
 def call_get_artist_endpoint(artist_id: str, access_token: str) -> dict:
     """Makes an API call to the artist_id endpoint. Returns the response dict."""
@@ -31,15 +34,52 @@ def call_get_artist_endpoint(artist_id: str, access_token: str) -> dict:
     response = req.get(url, headers=headers, timeout=TIMEOUT)
     if response.status_code == 200:
         return response.json()
-    raise ConnectionError(f"Failed to retrieve data. Code: {response.status_code}")
+    raise ConnectionError(
+        f"Failed to retrieve data. Code: {response.status_code}")
+
+
+def call_get_album_endpoint(album_id: str, access_token: str) -> dict:
+    """Makes an API call to the artist_id endpoint. Returns the response dict."""
+    url = f"{ALBUM_ENDPOINT}{album_id}"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = req.get(url, headers=headers, timeout=TIMEOUT)
+    if response.status_code == 200:
+        return response.json()
+    raise ConnectionError(
+        f"Failed to retrieve data. Code: {response.status_code}")
+
 
 def parse_artist_from_api(response: dict) -> dict:
-    """Removes unnecessary details from an get artist API response."""
-    return{
+    """Removes unnecessary details from a get artist API response."""
+    return {
         'spotify_id': response['id'],
         'name': response['name'],
         'genres': response['genres']
     }
+
+
+def calculate_runtime(tracks: dict) -> int:
+    """Calculates the runtime of an album from a tracks dict."""
+    items = tracks.get('items', [])
+    return round(sum([x.get('duration_ms', 0) for x in items])/1000)
+
+
+def parse_album_from_api(response: dict) -> dict:
+    """Removes unnecessary details from a get album API response."""
+    return {
+        'num_tracks': response['total_tracks'],
+        'album_type': response['album_type'],
+        'artists': [{
+            'spotify_id': x['id'],
+            'name': x['name']
+        } for x in response['artists']],
+        'runtime_seconds': calculate_runtime(response['tracks']),
+        'title': response['name'],
+        'release_date': parse_release_date(response['release_date'],
+                                           response['release_date_precision']),
+        'art_url': get_image_url(response)
+    }
+
 
 def parse_release_date(release_date: str, release_date_precision: str) -> str:
     """Returns a standardised release date string in
@@ -54,27 +94,31 @@ def parse_release_date(release_date: str, release_date_precision: str) -> str:
         return date_obj.strftime("01/%m/%Y")
 
     date_obj = datetime.strptime(release_date, "%Y-%m-%d")
-    return date_obj.strftime("%d/%m/%Y")
+    return date_obj.strftime("%Y-%m-%d")
+
 
 def parse_artists(album: dict) -> str:
     """Returns a string of comma joined artists from a Spotify album dict."""
-    artists = [x['name'] for x in album.get("artists",[])]
+    artists = [x['name'] for x in album.get("artists", [])]
     return ", ".join(artists)
+
 
 def get_image_url(album: dict) -> str:
     """Returns the URL for an album's art from a dict."""
     images = [x['url'] for x in album['images']]
     return images[0] if images else None
 
+
 def get_artists_from_artist_ids(artist_ids: list, access_token: str) -> list[dict]:
     """Returns a list of artist dicts from an album ID."""
     responses = [call_get_artist_endpoint(x, access_token) for x in artist_ids]
     return [parse_artist_from_api(response) for response in responses]
 
+
 def parse_search_results(albums: list[dict]) -> list[dict]:
     """Strips unnecessary information from the album dictionaries.
     Returns a list of cleaned album dictionary objects."""
-    return[
+    return [
         {
             "title": x['name'],
             "release_date": parse_release_date(x['release_date'], x['release_date_precision']),
@@ -84,8 +128,6 @@ def parse_search_results(albums: list[dict]) -> list[dict]:
         }
         for x in albums
     ]
-<<<<<<< Updated upstream
-=======
 
 
 def add_album(spotify_album_id: str, access_token: str):
@@ -95,12 +137,15 @@ def add_album(spotify_album_id: str, access_token: str):
         cleaned = parse_album_from_api(response)
         artists = cleaned['artists']
         all_artists = get_all_artists()
+
         all_genres = get_all_genres()
+
         for artist in artists:
             spotify_id = artist['spotify_id']
             if spotify_id not in all_artists:
                 artist_id = insert_artist(spotify_id, artist['name'])
                 all_artists[spotify_id] = artist_id
+
                 artist_info = parse_artist_from_api(
                     call_get_artist_endpoint(spotify_id, access_token))
                 for genre in artist_info.get('genres', []):
@@ -113,6 +158,7 @@ def add_album(spotify_album_id: str, access_token: str):
                     insert_artist_genre_assignment(artist_id, genre_id)
             else:
                 artist_id = all_artists[spotify_id]
+
         primary_artist_id = all_artists[artists[0]['spotify_id']]
 
         album_info = (
@@ -131,4 +177,3 @@ if __name__ == "__main__":
     load_dotenv()
     test_id = "5vkqYmiPBYLaalcmjujWxK"
     add_album(test_id, ENV['ACCESS_TOKEN'])
->>>>>>> Stashed changes

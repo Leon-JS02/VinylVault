@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+	<title>VinylVault - Home</title>
+</head>
+
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='images/vinyl_vault.png') }}" alt="VinylVault" class="logo">
+        <div class="search-container">
+            <form action="/display_search" method="POST">
+                <input type="text" name="search_query" placeholder="Search an album..." class="search-bar">
+                <button type="submit" class="search-icon">&#128269;</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
