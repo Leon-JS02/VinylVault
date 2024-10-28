@@ -66,7 +66,7 @@ def display_album(album_id: int):
 def recommend():
     """Gets recommendations and displays the page."""
     recs = get_recommendations(ACCESS_TOKEN)
-    return recs, 200
+    return render_template("recommendations.html", albums=recs)
 
 
 if __name__ == "__main__":
