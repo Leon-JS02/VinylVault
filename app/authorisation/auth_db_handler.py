@@ -40,6 +40,17 @@ def insert_new_access_token(client_id: str, client_secret: str, access_token: st
             cur.execute(insert_query, (client_id, access_token,
                                        client_secret, created_at, expires_at))
 
+def get_latest_token(client_id: str, client_secret: str) -> str:
+    """Returns the most recent access token stored in the database."""
+    stmt = """SELECT access_token FROM access_tokens
+    WHERE client_id = %s AND client_secret = %s
+    ORDER BY expires_at DESC
+    LIMIT 1;"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt, (client_id, client_secret))
+            results = cur.fetchone()
+    return results['access_token']
 
 def check_token_validity(client_id: str, access_token: str) -> bool:
     """Returns true if a valid access token is available for a client id."""

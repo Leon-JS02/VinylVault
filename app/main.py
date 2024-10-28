@@ -1,17 +1,15 @@
 """The main endpoints for the app's front-end."""
-from os import environ as ENV
-
 from flask import Flask, request, render_template
 from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id, get_all_albums
 
-from authorisation.access_manager import generate_and_replace
+from authorisation.access_manager import get_valid_token
 
 app = Flask(__name__)
 load_dotenv()
-
+ACCESS_TOKEN = get_valid_token()
 
 @app.route("/", methods=["GET"])
 def index():
@@ -23,7 +21,7 @@ def index():
 def display_search():
     """Displays search results of a particular query (made through a POST request)."""
     query = request.form.get("search_query").title()
-    results = search_album(query, ENV['ACCESS_TOKEN'])
+    results = search_album(query, ACCESS_TOKEN)
     parsed_results = parse_search_results(results)
     return render_template("display_search.html", albums=parsed_results, query=query)
 
@@ -31,7 +29,7 @@ def display_search():
 @app.route("/add/<string:spotify_album_id>", methods=["POST"])
 def add(spotify_album_id: str):
     """Adds an album of a specific Spotify ID to the user's collection."""
-    add_album(spotify_album_id, ENV['ACCESS_TOKEN'])
+    add_album(spotify_album_id, ACCESS_TOKEN)
     return {"message": "Adding album to collection..."}, 200
 
 
@@ -53,5 +51,4 @@ def display_album(album_id: int):
 if __name__ == "__main__":
     app.config["DEBUG"] = True
     app.config["TESTING"] = True
-
     app.run(port=8080, debug=True)
