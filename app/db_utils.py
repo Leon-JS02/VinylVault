@@ -50,14 +50,7 @@ def insert_genre(genre_name: str) -> int:
     return genre_id
 
 
-def get_all_artists() -> dict:
-    """Returns a dict of all Spotify artist IDs in the database."""
-    stmt = "SELECT artist_id, spotify_artist_id FROM artist;"
-    with get_connection() as conn:
-        with get_cursor(conn) as cur:
-            cur.execute(stmt)
-            results = cur.fetchall()
-    return {x['spotify_artist_id']: x['artist_id'] for x in results}
+
 
 
 def insert_artist_genre_assignment(artist_id: int, genre_id: int):
@@ -126,8 +119,8 @@ def get_all_genres() -> dict:
 
 def get_album_by_id(album_id: int) -> dict:
     """Retrieves full details of an album from the database by a specific ID."""
-    stmt = """SELECT ar.artist_name, a.*, 
-    STRING_AGG(g.genre_name, ', ' ORDER BY g.genre_name ASC) 
+    stmt = """SELECT ar.artist_name, a.*,
+    STRING_AGG(g.genre_name, ', ' ORDER BY g.genre_name ASC)
     AS genres FROM genre AS g JOIN artist_genre_assignment 
     USING(genre_id) JOIN album AS a USING(artist_id) 
     JOIN artist AS ar USING(artist_id) WHERE album_id = %s
