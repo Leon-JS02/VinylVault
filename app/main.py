@@ -8,7 +8,7 @@ from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id, get_all_albums
 from authorisation.access_manager import get_valid_token
 
-app = Flask(__name__)
+app = Flsk(__name__)
 load_dotenv()
 ACCESS_TOKEN = get_valid_token()
 
@@ -48,8 +48,7 @@ def random_choice():
         random_album = choice(albums)
         random_album_id = random_album['album_id']
         return redirect(url_for('display_album', album_id=random_album_id))
-    else:
-        return redirect(url_for('collection'))  
+    return redirect(url_for('collection'))  
 
 @app.route("/collection/<int:album_id>", methods=["GET"])
 def display_album(album_id: int):
