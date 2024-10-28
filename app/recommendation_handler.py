@@ -1,6 +1,9 @@
 """Script to handle record recommendations."""
+<<<<<<< HEAD
 # pylint: skip file
 # skeleton
+=======
+>>>>>>> fd9c12cc68358a553c1234eade475c8846c904ab
 
 from endpoints import RECOMMENDATIONS_ENDPOINT
 from db_utils import get_connection, get_cursor
