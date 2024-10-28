@@ -1,10 +1,11 @@
 """The main endpoints for the app's front-end."""
-from flask import Flask, request, render_template
+from random import choice
+
+from flask import Flask, request, render_template, redirect, url_for
 from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id, get_all_albums
-
 from authorisation.access_manager import get_valid_token
 
 app = Flask(__name__)
@@ -39,6 +40,16 @@ def collection():
     albums = get_all_albums()
     return render_template("collection.html", albums=albums), 200
 
+@app.route("/random_choice", methods=["GET"])
+def random_choice():
+    """Redirects the user to a random record in their collection."""
+    albums = get_all_albums()
+    if albums:
+        random_album = choice(albums)
+        random_album_id = random_album['album_id']
+        return redirect(url_for('display_album', album_id=random_album_id))
+    else:
+        return redirect(url_for('collection'))  
 
 @app.route("/collection/<int:album_id>", methods=["GET"])
 def display_album(album_id: int):
