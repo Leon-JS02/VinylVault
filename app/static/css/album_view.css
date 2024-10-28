@@ -87,3 +87,9 @@ body {
     color: #666;
     margin: 5px 0;
 }
+
+
+.random-choice i{
+    font-size: 35px;
+    text-align: center;
+}
