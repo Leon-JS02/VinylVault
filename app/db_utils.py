@@ -1,6 +1,7 @@
 """Script to handle the database interactions for the main app."""
 
 from os import environ as ENV
+from datetime import datetime
 
 from psycopg2 import connect
 from psycopg2.extras import RealDictCursor
@@ -116,6 +117,21 @@ def get_all_genres() -> dict:
             res = cur.fetchall()
     return {x['genre_name']: x['genre_id'] for x in res}
 
+def format_runtime(seconds: int) -> str:
+    """Returns a string representing the runtime in minutes and seconds."""
+    minutes = seconds // 60
+    remainder = seconds % 60
+    return f"{minutes}:{remainder:02}"
+
+def format_genres(genres: str):
+    """Capitalises the genre names."""
+    genre_list = [genre.strip().title() for genre in genres.split(',')]
+    return ', '.join(genre_list)
+
+def format_release(release_date: datetime) -> str:
+    """Formats release date from YYYY-MM-DD to 'D, Mon YYYY'."""
+    return release_date.strftime("%-d, %b %Y")
+
 
 def get_album_by_id(album_id: int) -> dict:
     """Retrieves full details of an album from the database by a specific ID."""
@@ -133,9 +149,9 @@ def get_album_by_id(album_id: int) -> dict:
     return {
         "title": res['album_name'],
         "artist": res['artist_name'],
-        "genres": res['genres'],
-        "release_date": res['release_date'],
+        "genres": format_genres(res['genres']),
+        "release_date": format_release(res['release_date']),
         "num_tracks": res['num_tracks'],
-        "runtime_seconds": res['runtime_seconds'],
+        "runtime_seconds": format_runtime(res['runtime_seconds']),
         "album_art_url": res['album_art_url']
     }
