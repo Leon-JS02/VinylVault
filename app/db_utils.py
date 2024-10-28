@@ -51,9 +51,6 @@ def insert_genre(genre_name: str) -> int:
     return genre_id
 
 
-
-
-
 def insert_artist_genre_assignment(artist_id: int, genre_id: int):
     """Inserts an artist genre assignment into the database."""
     stmt = """INSERT INTO artist_genre_assignment(artist_id, genre_id)
@@ -117,16 +114,19 @@ def get_all_genres() -> dict:
             res = cur.fetchall()
     return {x['genre_name']: x['genre_id'] for x in res}
 
+
 def format_runtime(seconds: int) -> str:
     """Returns a string representing the runtime in minutes and seconds."""
     minutes = seconds // 60
     remainder = seconds % 60
     return f"{minutes}:{remainder:02}"
 
+
 def format_genres(genres: str):
     """Capitalises the genre names."""
     genre_list = [genre.strip().title() for genre in genres.split(',')]
     return ', '.join(genre_list)
+
 
 def format_release(release_date: datetime) -> str:
     """Formats release date from YYYY-MM-DD to 'D, Mon YYYY'."""
