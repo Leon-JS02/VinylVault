@@ -1,15 +1,14 @@
 """Script to handle the querying of the external Spotify API."""
 
 from datetime import datetime
+from os import environ as ENV
+from dotenv import load_dotenv
+
 import requests as req
 
-
-from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT
-
-from dotenv import load_dotenv
-from os import environ as ENV
 from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT, ALBUM_ENDPOINT
-from db_utils import insert_artist, insert_genre, insert_artist_genre_assignment, insert_album, get_all_artists, get_all_genres
+from db_utils import (insert_artist, insert_genre, insert_artist_genre_assignment,
+                      insert_album, get_all_artists, get_all_genres)
 
 
 TIMEOUT = 10
@@ -61,7 +60,7 @@ def parse_artist_from_api(response: dict) -> dict:
 def calculate_runtime(tracks: dict) -> int:
     """Calculates the runtime of an album from a tracks dict."""
     items = tracks.get('items', [])
-    return round(sum([x.get('duration_ms', 0) for x in items])/1000)
+    return round(sum(x.get('duration_ms', 0) for x in items)/1000)
 
 
 def parse_album_from_api(response: dict) -> dict:
@@ -132,45 +131,67 @@ def parse_search_results(albums: list[dict]) -> list[dict]:
 
 def add_album(spotify_album_id: str, access_token: str):
     """Adds an album to the database, handling foreign key dependencies."""
-    try:
-        response = call_get_album_endpoint(spotify_album_id, access_token)
-        cleaned = parse_album_from_api(response)
-        artists = cleaned['artists']
-        all_artists = get_all_artists()
+    album_data = fetch_and_parse_album_data(spotify_album_id, access_token)
+    artist_ids = process_artists(album_data['artists'], access_token)
+    primary_artist_id = artist_ids[0]
+    album_info = (
+        primary_artist_id, spotify_album_id, album_data['album_type'],
+        album_data['title'], album_data['release_date'],
+        album_data['num_tracks'], album_data['runtime_seconds'],
+        album_data['art_url']
+    )
+    insert_album(album_info)
 
-        all_genres = get_all_genres()
 
-        for artist in artists:
-            spotify_id = artist['spotify_id']
-            if spotify_id not in all_artists:
-                artist_id = insert_artist(spotify_id, artist['name'])
-                all_artists[spotify_id] = artist_id
+def fetch_and_parse_album_data(spotify_album_id: str, access_token: str) -> dict:
+    """Fetches album data from the API and parses it."""
+    response = call_get_album_endpoint(spotify_album_id, access_token)
+    return parse_album_from_api(response)
 
-                artist_info = parse_artist_from_api(
-                    call_get_artist_endpoint(spotify_id, access_token))
-                for genre in artist_info.get('genres', []):
-                    if genre not in all_genres:
-                        genre_id = insert_genre(genre)
-                        all_genres[genre] = genre_id
-                    else:
-                        genre_id = all_genres[genre]
 
-                    insert_artist_genre_assignment(artist_id, genre_id)
-            else:
-                artist_id = all_artists[spotify_id]
+def process_artists(artists: list, access_token: str) -> list:
+    """Processes and inserts artists if necessary, returning their IDs."""
+    artist_ids = []
+    all_artists = get_all_artists()
+    all_genres = get_all_genres()
 
-        primary_artist_id = all_artists[artists[0]['spotify_id']]
+    for artist in artists:
+        artist_id = get_or_create_artist(
+            artist, all_artists, all_genres, access_token)
+        artist_ids.append(artist_id)
 
-        album_info = (
-            primary_artist_id, spotify_album_id, cleaned['album_type'],
-            cleaned['title'], cleaned['release_date'], cleaned['num_tracks'],
-            cleaned['runtime_seconds'], cleaned['art_url']
-        )
+    return artist_ids
 
-        insert_album(album_info)
 
-    except Exception as e:
-        print(f"Failed to add album {spotify_album_id}: {e}")
+def get_or_create_artist(artist: dict, all_artists: dict,
+                         all_genres: dict, access_token: str) -> int:
+    """Retrieves or inserts an artist and their genres."""
+    spotify_id = artist['spotify_id']
+
+    if spotify_id not in all_artists:
+        artist_id = insert_artist(spotify_id, artist['name'])
+        all_artists[spotify_id] = artist_id
+        fetch_and_assign_genres(artist_id, spotify_id,
+                                all_genres, access_token)
+    else:
+        artist_id = all_artists[spotify_id]
+
+    return artist_id
+
+
+def fetch_and_assign_genres(artist_id: int, spotify_id: str, all_genres: dict, access_token: str):
+    """Fetches and assigns genres to an artist, inserting any new genres."""
+    artist_info = parse_artist_from_api(
+        call_get_artist_endpoint(spotify_id, access_token))
+
+    for genre in artist_info.get('genres', []):
+        if genre not in all_genres:
+            genre_id = insert_genre(genre)
+            all_genres[genre] = genre_id
+        else:
+            genre_id = all_genres[genre]
+
+        insert_artist_genre_assignment(artist_id, genre_id)
 
 
 if __name__ == "__main__":
