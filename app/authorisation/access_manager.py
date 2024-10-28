@@ -3,12 +3,11 @@
 from os import environ as ENV
 
 import requests as req
-from dotenv import set_key
 
-from authorisation.auth_db_handler import insert_new_access_token, check_token_validity
+from authorisation.auth_db_handler import get_latest_token, check_token_validity, insert_new_access_token
 
 TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
-REQUIRED_AUTH_KEYS = ["CLIENT_ID", "CLIENT_SECRET", "ACCESS_TOKEN"]
+REQUIRED_AUTH_KEYS = ["CLIENT_ID", "CLIENT_SECRET"]
 
 
 def call_token_api(client_id: str, client_secret: str) -> str:
@@ -29,33 +28,15 @@ def call_token_api(client_id: str, client_secret: str) -> str:
 
     raise ConnectionError("Error. Please check your credentials.")
 
-
-def overwrite_dotenv(auth_token: str) -> None:
-    """Overwrites the value for 'ACCESS_TOKEN' in the .env"""
-    set_key(ENV['ENV_PATH'], "ACCESS_TOKEN", auth_token)
-
-
-def setup_authentication() -> str:
-    """Initialises the authentication for use within the main app.
-    Checks for a valid access token, client ID, and client secret.
-    Reauthenticates if necessary. Returns a valid token."""
+def get_valid_token() -> str:
+    """Returns the latest token if still valid. Else generates, stores, and returns
+    a new token."""
     if not all(key in ENV for key in REQUIRED_AUTH_KEYS):
         raise ValueError(".env has not been configured correctly.")
-    # User must be reauthenticated - expired token
-    if not check_token_validity(ENV['CLIENT_ID'], ENV['ACCESS_TOKEN']):
-        generate_and_replace()
-    return ENV['ACCESS_TOKEN']
+    latest_token = get_latest_token(ENV['CLIENT_ID'], ENV['CLIENT_SECRET'])
+    if check_token_validity(ENV['CLIENT_ID'], latest_token):
+        return latest_token
+    new_token, expires_in = call_token_api(ENV['CLIENT_ID'], ENV['CLIENT_SECRET'])
+    insert_new_access_token(ENV['CLIENT_ID'], ENV['CLIENT_SECRET'], new_token, expires_in)
+    return new_token
 
-
-def generate_and_replace():
-    """Main function for the script. Generates and replaces
-    the old access token within the .env file."""
-    auth_token, expires_in = call_token_api(
-        ENV['CLIENT_ID'], ENV['CLIENT_SECRET'])
-    overwrite_dotenv(auth_token)
-    insert_new_access_token(
-        ENV['CLIENT_ID'], ENV['CLIENT_SECRET'], auth_token, expires_in)
-
-
-if __name__ == "__main__":
-    generate_and_replace()

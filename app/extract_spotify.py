@@ -1,8 +1,6 @@
 """Script to handle the querying of the external Spotify API."""
 
 from datetime import datetime
-from os import environ as ENV
-from dotenv import load_dotenv
 
 import requests as req
 
@@ -193,8 +191,3 @@ def fetch_and_assign_genres(artist_id: int, spotify_id: str, all_genres: dict, a
 
         insert_artist_genre_assignment(artist_id, genre_id)
 
-
-if __name__ == "__main__":
-    load_dotenv()
-    test_id = "5vkqYmiPBYLaalcmjujWxK"
-    add_album(test_id, ENV['ACCESS_TOKEN'])
