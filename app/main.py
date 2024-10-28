@@ -7,10 +7,12 @@ from dotenv import load_dotenv
 from extract_spotify import (search_album, parse_search_results, add_album)
 from db_utils import get_album_by_id, get_all_albums
 from authorisation.access_manager import get_valid_token
+from recommendation_handler import get_recommendations
 
-app = Flsk(__name__)
+app = Flask(__name__)
 load_dotenv()
 ACCESS_TOKEN = get_valid_token()
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -40,6 +42,7 @@ def collection():
     albums = get_all_albums()
     return render_template("collection.html", albums=albums), 200
 
+
 @app.route("/random_choice", methods=["GET"])
 def random_choice():
     """Redirects the user to a random record in their collection."""
@@ -48,7 +51,8 @@ def random_choice():
         random_album = choice(albums)
         random_album_id = random_album['album_id']
         return redirect(url_for('display_album', album_id=random_album_id))
-    return redirect(url_for('collection'))  
+    return redirect(url_for('collection'))
+
 
 @app.route("/collection/<int:album_id>", methods=["GET"])
 def display_album(album_id: int):
@@ -56,6 +60,13 @@ def display_album(album_id: int):
     # Get album by ID.
     album_info = get_album_by_id(album_id)
     return render_template("view_album.html", album=album_info), 200
+
+
+@app.route("/recommend", methods=["GET"])
+def recommend():
+    """Gets recommendations and displays the page."""
+    recs = get_recommendations(ACCESS_TOKEN)
+    return recs, 200
 
 
 if __name__ == "__main__":

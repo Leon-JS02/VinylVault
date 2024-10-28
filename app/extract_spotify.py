@@ -190,4 +190,3 @@ def fetch_and_assign_genres(artist_id: int, spotify_id: str, all_genres: dict, a
             genre_id = all_genres[genre]
 
         insert_artist_genre_assignment(artist_id, genre_id)
-
