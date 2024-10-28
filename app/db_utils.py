@@ -130,7 +130,7 @@ def format_genres(genres: str):
 
 def format_release(release_date: datetime) -> str:
     """Formats release date from YYYY-MM-DD to 'D, Mon YYYY'."""
-    return release_date.strftime("%-d, %b %Y")
+    return release_date.strftime("%-d %b %Y")
 
 
 def get_album_by_id(album_id: int) -> dict:
