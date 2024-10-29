@@ -2,6 +2,7 @@
 from random import choice
 
 from flask import Flask, request, render_template, redirect, url_for
+import streamlit as st
 from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
@@ -72,6 +73,7 @@ def recommend():
 @app.route("/analytics", methods=["GET"])
 def analytics():
     """Defines the Streamlit analytics dashboard for the user's collection."""
+    st.set_page_config(page_title="VinylVault - Collection Analytics")
     return {"Message": "Hello, world"}, 200
 
 
