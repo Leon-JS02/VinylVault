@@ -4,3 +4,6 @@ requests
 psycopg2
 python-dotenv
 flask
+streamlit
+pandas
+altair
