@@ -69,6 +69,12 @@ def recommend():
     return render_template("recommendations.html", albums=recs)
 
 
+@app.route("/analytics", methods=["GET"])
+def analytics():
+    """Defines the Streamlit analytics dashboard for the user's collection."""
+    return {"Message": "Hello, world"}, 200
+
+
 if __name__ == "__main__":
     app.config["DEBUG"] = True
     app.config["TESTING"] = True
