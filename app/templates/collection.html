@@ -12,7 +12,7 @@
 
 <body>
     <div class="navbar">
-        <div class="logo"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></div>
+        <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></a></div>
         <div class="nav-icons">
             <a href="/" class="nav-icon" title="Home"><i class="fas fa-home"></i></a>
             <a href="/collection" class="nav-icon" title="Collection"><i class="fas fa-box"></i></a>
@@ -30,7 +30,7 @@
             <div class="album-card">
                 <input type="hidden" value="{{ album['spotify_id'] }}" />
                 <a href="/collection/{{ album['album_id'] }}">
-                    <img src="{{ album['img_url'] }}" alt="{{ album['title'] }} album cover">
+                    <img src="{{ album['img_url'] }}" draggable="false" alt="{{ album['title'] }} album cover">
                 </a>
                 <div class="album-info">
                     <div class="album-title">{{ album['title'] }}</div>

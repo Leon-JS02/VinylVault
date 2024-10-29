@@ -16,7 +16,7 @@
 <body>
     <div class="background-container"></div>
     <div class="navbar">
-        <div class="logo"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></div>
+        <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></a></div>
         <div class="nav-icons">
             <a href="/" class="nav-icon" title="Home"><i class="fas fa-home"></i></a>
             <a href="/collection" class="nav-icon" title="Collection"><i class="fas fa-box"></i></a>
@@ -39,7 +39,7 @@
             <div class="carousel-inner">
                 {% for album in albums %}
                 <div class="carousel-item {% if loop.index0 == 0 %} active {% endif %}">
-                    <img src="{{ album['img_url'] }}" class="d-block w-100" alt="{{ album['title'] }}">
+                    <img src="{{ album['img_url'] }}" draggable="false" class="d-block w-100" alt="{{ album['title'] }}">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>{{ album['album_name'] }} by {{ album['artist_name'] }}</h5>
                         <p>{{ album['release_date'] }}</p>
