@@ -3,7 +3,7 @@
 tag_counts = """
 SELECT t.tag_name, COUNT(t.tag_id) AS tag_count
 FROM tag AS t
-JOIN album_tag_assigment
+JOIN album_tag_assignment
 AS ata ON ata.tag_id = t.tag_id
 GROUP BY t.tag_name
 ORDER BY tag_count DESC;
