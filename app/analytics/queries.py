@@ -30,3 +30,7 @@ FROM AlbumDecades AS ad
 GROUP BY ad.decade_name
 ORDER BY decade_count DESC;
 """
+
+album_count = """
+SELECT COUNT(*) FROM album;
+"""
