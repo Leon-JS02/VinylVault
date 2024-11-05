@@ -5,7 +5,6 @@ from os import environ as ENV
 from psycopg2 import connect
 from psycopg2.extensions import connection, cursor
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
 
 from queries import decade_counts, genre_counts, tag_counts, album_count
 
@@ -66,7 +65,3 @@ def get_album_count() -> int:
     """Returns the number of releases in the user's collection."""
     results = execute_query(album_count)
     return results[0]['count']
-
-
-load_dotenv()
-print(get_album_count())
