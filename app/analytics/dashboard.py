@@ -10,4 +10,4 @@ if __name__ == "__main__":
     st.set_page_config(layout="wide")
     decade_data = get_decade_counts()
     chart = decade_chart(decade_data)
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=False)
