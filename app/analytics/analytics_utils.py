@@ -7,7 +7,7 @@ from psycopg2.extensions import connection, cursor
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
-from queries import decade_counts, genre_counts, tag_counts
+from queries import decade_counts, genre_counts, tag_counts, album_count
 
 
 def get_connection() -> connection:
@@ -62,5 +62,11 @@ def get_tag_counts() -> dict[str, int]:
     }
 
 
+def get_album_count() -> int:
+    """Returns the number of releases in the user's collection."""
+    results = execute_query(album_count)
+    return results[0]['count']
+
+
 load_dotenv()
-print(get_tag_counts())
+print(get_album_count())
