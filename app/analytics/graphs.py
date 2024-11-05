@@ -19,3 +19,22 @@ def decade_chart(data: dict) -> alt.Chart:
     )
 
     return chart
+
+
+def genre_chart(data: dict) -> alt.Chart:
+    """Returns an Altair bar chart for genre/release breakdowns."""
+    sorted_data = sorted(data.items(), key=lambda x: x[1], reverse=True)
+    top_10 = sorted_data[:10]
+
+    data_list = [{"Genre": genre.title(), "Count": count}
+                 for genre, count in top_10]
+
+    chart = alt.Chart(alt.Data(values=data_list)).mark_bar().encode(
+        x=alt.X("Count:Q", title="Count"),
+        y=alt.Y("Genre:N", sort="-x", title="Genre"),
+        tooltip=[alt.Tooltip("Genre:N"), alt.Tooltip("Count:Q")]
+    ).properties(
+        title="Top 10 Genres by Count"
+    )
+
+    return chart
