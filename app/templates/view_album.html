@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/album_view.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <title>VinylVault - {{ album['title'] }}</title>
@@ -115,15 +116,20 @@
 </head>
 
 <body>
+</head>
+
+<body>
+
     <div class="navbar">
         <div class="logo">
-            <img src="{{ url_for('static', filename='images/vinyl_vault.png') }}" alt="VinylVault Logo">
+            <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></a></div>
         </div>
         <div class="nav-icons">
             <a href="/" class="nav-icon" title="Home"><i class="fas fa-home"></i></a>
-            <a href="collection" class="nav-icon" title="Collection"><i class="fas fa-box"></i></a>
-            <a href="#" class="nav-icon" title="Analytics"><i class="fas fa-chart-bar"></i></a>
-            <a href="#" class="nav-icon" title="Shopping"><i class="fas fa-shopping-cart"></i></a>
+            <a href="/collection" class="nav-icon" title="Collection"><i class="fas fa-box"></i></a>
+            <a href="/recommend" class="nav-icon" title="Recommendations"><i class="fa-solid fa-record-vinyl"></i></a>
+            <a href="/analytics" class="nav-icon" title="Analytics"><i class="fas fa-chart-bar"></i></a>
+            <a href="/" class="nav-icon" title="Shopping"><i class="fas fa-shopping-cart"></i></a>
         </div>
     </div>
 
@@ -142,6 +148,23 @@
             <button class="delete-button" onclick="delete_album({{ album['album_id'] }})">
                 <i class="fas fa-trash-alt"></i> Delete Album
             </button>
+
+    <br>
+    <content>
+    <div class="random-choice">
+    <a href="{{ url_for('random_choice') }}" style="text-decoration: none; color: #000;">
+        <i class="fas fa-random random-icon"></i>
+    </a>
+    </div>
+    <div class="container">
+        <img src="{{ album['album_art_url'] }}" alt="{{ album['title'] }} album cover" class="album-art">
+        <div class="album-info">
+            <h2>{{ album['title'] }}</h2>
+            <p><strong>Artist:</strong> {{ album['artist'] }}</p>
+            <p><strong>Genres:</strong> {{ album['genres'] }}</p>
+            <p><strong>Release Date:</strong> {{ album['release_date'] }}</p>
+            <p><strong>Tracks:</strong> {{ album['num_tracks'] }}</p>
+            <p><strong>Runtime:</strong> {{ album['runtime_seconds'] }}</p>
         </div>
     </content>
 </body>

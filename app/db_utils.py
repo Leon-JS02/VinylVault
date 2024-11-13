@@ -61,6 +61,17 @@ def delete_album_by_id(album_id: int):
             cur.execute(tag_stmt, (album_id,))
         conn.commit()
 
+def insert_tag(tag_name: str) -> int:
+    """Inserts an tag into the database, returning its ID."""
+    stmt = """INSERT INTO tag(tag_name)
+    VALUES (%s) RETURNING tag_id;"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt, (tag_name,))
+            tag_id = cur.fetchone()['tag_id']
+        conn.commit()
+    return tag_id
+
 
 def insert_artist_genre_assignment(artist_id: int, genre_id: int):
     """Inserts an artist genre assignment into the database."""
@@ -69,6 +80,16 @@ def insert_artist_genre_assignment(artist_id: int, genre_id: int):
     with get_connection() as conn:
         with get_cursor(conn) as cur:
             cur.execute(stmt, (artist_id, genre_id,))
+        conn.commit()
+
+
+def insert_album_tag_assignment(album_id: int, tag_id: int):
+    """Inserts an album tag assignment into the database."""
+    stmt = """INSERT INTO album_tag_assignment(album_id, tag_id)
+    VALUES (%s, %s);"""
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt, (album_id, tag_id,))
         conn.commit()
 
 
@@ -124,6 +145,17 @@ def get_all_genres() -> dict:
             cur.execute(stmt)
             res = cur.fetchall()
     return {x['genre_name']: x['genre_id'] for x in res}
+
+
+
+def get_all_tags() -> dict:
+    """Returns a dict of all tags mapped to their IDs."""
+    stmt = "SELECT tag_id, tag_name FROM tag;"
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(stmt)
+            res = cur.fetchall()
+    return {x['tag_name']: x['tag_id'] for x in res}
 
 
 def format_runtime(seconds: int) -> str:

@@ -1,0 +1,33 @@
+.carousel-container {
+    max-width: 650px; 
+    margin: 0 auto;
+}
+
+.carousel-inner img {
+    height: 650px;
+    object-fit: cover;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.6); 
+    padding: 15px;
+    border-radius: 5px; 
+}
+
+.carousel-caption h5, .carousel-caption p {
+    color: #ffffff;
+    text-shadow: 3px 1px 5px rgba(0, 0, 0, 0.8);
+}
+
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    filter: blur(10px);
+    transition: background-image 0.5s ease;
+}

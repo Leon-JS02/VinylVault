@@ -1,15 +1,13 @@
 """Script to handle the querying of the external Spotify API."""
 
 from datetime import datetime
-from os import environ as ENV
-from dotenv import load_dotenv
 
 import requests as req
 
 from endpoints import SEARCH_ENDPOINT, ARTIST_ENDPOINT, ALBUM_ENDPOINT
 from db_utils import (insert_artist, insert_genre, insert_artist_genre_assignment,
                       insert_album, get_all_artists, get_all_genres)
-
+from extract_lastfm import process_tags
 
 TIMEOUT = 10
 
@@ -140,7 +138,9 @@ def add_album(spotify_album_id: str, access_token: str):
         album_data['num_tracks'], album_data['runtime_seconds'],
         album_data['art_url']
     )
-    insert_album(album_info)
+    album_id = insert_album(album_info)
+    process_tags(album_id, album_data['title'],
+                 album_data['artists'][0]['name'])
 
 
 def fetch_and_parse_album_data(spotify_album_id: str, access_token: str) -> dict:
@@ -192,9 +192,3 @@ def fetch_and_assign_genres(artist_id: int, spotify_id: str, all_genres: dict, a
             genre_id = all_genres[genre]
 
         insert_artist_genre_assignment(artist_id, genre_id)
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    test_id = "5vkqYmiPBYLaalcmjujWxK"
-    add_album(test_id, ENV['ACCESS_TOKEN'])

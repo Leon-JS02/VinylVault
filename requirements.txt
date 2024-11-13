@@ -4,3 +4,6 @@ requests
 psycopg2
 python-dotenv
 flask
+beautifulsoup4
+altair
+streamlit

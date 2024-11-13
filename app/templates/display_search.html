@@ -5,109 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/display.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <title>VinylVault - Search Results</title>
-    <style>
-        * {
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .container {
-            max-width: 90%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .album-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .album-card {
-            background-color: #f8f8f8;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            padding-bottom: 10px;
-            cursor: pointer;
-        }
-        .image-container {
-            position: relative;
-        }
-
-        .album-card img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            transition: opacity 0.3s ease;
-        }
-        .album-card:hover img {
-            opacity: 0.6;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            font-size: 3em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .album-card:hover .overlay {
-            opacity: 1;
-        }
-
-        .album-info {
-            padding: 10px;
-        }
-
-        .album-title {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-top: 10px;
-        }
-
-        h1 {
-            font-size: 20px;
-        }
-
-        .album-artist,
-        .album-release-date {
-            font-size: 0.9em;
-            color: #555;
-        }
-    </style>
+    <title>VinylVault - Search Results: {{ query }}</title>
 </head>
 
 <div class="navbar">
-        <div class="logo"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></div>
+        <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/vinyl_vault.png') }}"></a></div>
         <div class="nav-icons">
             <a href="/" class="nav-icon" title="Home"><i class="fas fa-home"></i></a>
-            <a href="collection" class="nav-icon" title="Collection"><i class="fas fa-box"></i></a>
-            <a href="#" class="nav-icon" title="Analytics"><i class="fas fa-chart-bar"></i></a>
-            <a href="#" class="nav-icon" title="Shopping"><i class="fas fa-shopping-cart"></i></a>
+            <a href="/collection" class="nav-icon" title="Collection"><i class="fas fa-box"></i></a>
+            <a href="/recommend" class="nav-icon" title="Recommendations"><i class="fa-solid fa-record-vinyl"></i></a>
+            <a href="/analytics" class="nav-icon" title="Analytics"><i class="fas fa-chart-bar"></i></a>
+            <a href="/" class="nav-icon" title="Shopping"><i class="fas fa-shopping-cart"></i></a>
         </div>
 </div>
 
 <body>
     <div class="container">
         <h1>Search results for '{{ query }}'...</h1>
+        <h2>{{albums | length}} results shown</h2>
 
         <div class="album-grid">
             {% for album in albums %}
             <div class="album-card">
                 <input type="hidden" value="{{ album['spotify_id'] }}" />
                 <div class="image-container">
-                    <img src="{{ album['img_url'] }}" alt="{{ album['title'] }} album cover">
+                    <img src="{{ album['img_url'] }}" draggable="false" alt="{{ album['title'] }} album cover">
                     <div class="overlay" onclick="call_add('{{ album['spotify_id'] }}')">+</div>
                 </div>
 
