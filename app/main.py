@@ -5,7 +5,7 @@ from flask import Flask, request, render_template
 from dotenv import load_dotenv
 
 from extract_spotify import (search_album, parse_search_results, add_album)
-from db_utils import get_album_by_id, get_all_albums
+from db_utils import get_album_by_id, get_all_albums, delete_album_by_id
 
 from authorisation.access_manager import generate_and_replace
 
@@ -39,7 +39,10 @@ def add(spotify_album_id: str):
 @app.route("/delete_album", methods=["DELETE"])
 def delete_album():
     """Deletes an album from the collection by its ID."""
-    pass
+    album_id = request.get_json()['album_id']
+    delete_album_by_id(album_id)
+    albums = get_all_albums()
+    return render_template("collection.html", albums=albums), 200
 
 
 @app.route("/collection", methods=["GET"])
