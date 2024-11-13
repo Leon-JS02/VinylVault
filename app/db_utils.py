@@ -158,6 +158,7 @@ def get_album_by_id(album_id: int) -> dict:
             res = cur.fetchone()
 
     return {
+        'album_id': res['album_id'],
         "title": res['album_name'],
         "artist": res['artist_name'],
         "genres": format_genres(res['genres']),
