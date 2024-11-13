@@ -51,7 +51,15 @@ def insert_genre(genre_name: str) -> int:
     return genre_id
 
 
-
+def delete_album_by_id(album_id: int):
+    """Deletes an album from the database. Handles foreign key dependencies."""
+    album_stmt = "DELETE FROM album WHERE album_id = %s"
+    tag_stmt = "DELETE FROM album_tag_assignment WHERE album_id = %s"
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(album_stmt, (album_id,))
+            cur.execute(tag_stmt, (album_id,))
+        conn.commit()
 
 
 def insert_artist_genre_assignment(artist_id: int, genre_id: int):
@@ -117,16 +125,19 @@ def get_all_genres() -> dict:
             res = cur.fetchall()
     return {x['genre_name']: x['genre_id'] for x in res}
 
+
 def format_runtime(seconds: int) -> str:
     """Returns a string representing the runtime in minutes and seconds."""
     minutes = seconds // 60
     remainder = seconds % 60
     return f"{minutes}:{remainder:02}"
 
+
 def format_genres(genres: str):
     """Capitalises the genre names."""
     genre_list = [genre.strip().title() for genre in genres.split(',')]
     return ', '.join(genre_list)
+
 
 def format_release(release_date: datetime) -> str:
     """Formats release date from YYYY-MM-DD to 'D, Mon YYYY'."""
