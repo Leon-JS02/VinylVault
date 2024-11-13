@@ -134,6 +134,11 @@
     </div>
 
     <content>
+         <div class="random-choice">
+        <a href="{{ url_for('random_choice') }}" style="text-decoration: none; color: #000;">
+            <i class="fas fa-random random-icon"></i>
+        </a>
+        </div>
         <div class="container">
             <img src="{{ album['album_art_url'] }}" alt="{{ album['title'] }} album cover" class="album-art">
             <div class="album-info">
@@ -150,22 +155,7 @@
             </button>
 
     <br>
-    <content>
-    <div class="random-choice">
-    <a href="{{ url_for('random_choice') }}" style="text-decoration: none; color: #000;">
-        <i class="fas fa-random random-icon"></i>
-    </a>
-    </div>
-    <div class="container">
-        <img src="{{ album['album_art_url'] }}" alt="{{ album['title'] }} album cover" class="album-art">
-        <div class="album-info">
-            <h2>{{ album['title'] }}</h2>
-            <p><strong>Artist:</strong> {{ album['artist'] }}</p>
-            <p><strong>Genres:</strong> {{ album['genres'] }}</p>
-            <p><strong>Release Date:</strong> {{ album['release_date'] }}</p>
-            <p><strong>Tracks:</strong> {{ album['num_tracks'] }}</p>
-            <p><strong>Runtime:</strong> {{ album['runtime_seconds'] }}</p>
-        </div>
+
     </content>
 </body>
 </html>
