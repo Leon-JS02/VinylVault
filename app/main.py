@@ -36,6 +36,12 @@ def add(spotify_album_id: str):
     return {"message": "Adding album to collection..."}, 200
 
 
+@app.route("/delete_album", methods=["DELETE"])
+def delete_album():
+    """Deletes an album from the collection by its ID."""
+    pass
+
+
 @app.route("/collection", methods=["GET"])
 def collection():
     """Displays the user's entire collection within their database."""
