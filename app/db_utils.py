@@ -51,6 +51,16 @@ def insert_genre(genre_name: str) -> int:
     return genre_id
 
 
+def delete_album_by_id(album_id: int):
+    """Deletes an album from the database. Handles foreign key dependencies."""
+    album_stmt = "DELETE FROM album WHERE album_id = %s"
+    tag_stmt = "DELETE FROM album_tag_assignment WHERE album_id = %s"
+    with get_connection() as conn:
+        with get_cursor(conn) as cur:
+            cur.execute(album_stmt, (album_id,))
+            cur.execute(tag_stmt, (album_id,))
+        conn.commit()
+
 def insert_tag(tag_name: str) -> int:
     """Inserts an tag into the database, returning its ID."""
     stmt = """INSERT INTO tag(tag_name)
@@ -137,6 +147,7 @@ def get_all_genres() -> dict:
     return {x['genre_name']: x['genre_id'] for x in res}
 
 
+
 def get_all_tags() -> dict:
     """Returns a dict of all tags mapped to their IDs."""
     stmt = "SELECT tag_id, tag_name FROM tag;"
@@ -179,6 +190,7 @@ def get_album_by_id(album_id: int) -> dict:
             res = cur.fetchone()
 
     return {
+        'album_id': res['album_id'],
         "title": res['album_name'],
         "artist": res['artist_name'],
         "genres": format_genres(res['genres']),
